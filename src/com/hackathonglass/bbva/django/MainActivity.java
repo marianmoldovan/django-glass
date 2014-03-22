@@ -59,9 +59,9 @@ public class MainActivity extends Activity {
 			public void onCompleted(Exception e, List<Flat> arg1) {
 				if(e != null);//Si la excepcion no es null, es que algo ha pasao...
 				else{
-//					unpublishCard(MainActivity.this);
-					
-			        mCardScrollView = new CardScrollView(MainActivity.this);					unpublishCard(MainActivity.this);
+//					unpublishCardpiashfidoàhfs(MainActivity.this);
+			        mCardScrollView = new CardScrollView(MainActivity.this);	
+			        unpublishCard(MainActivity.this);
 			        setContentView(mCardScrollView);
 					createCards(arg1);
 					superAdapter = new FlatCardScrollAdapter(arg1);
@@ -135,33 +135,6 @@ public class MainActivity extends Activity {
 	    }
 	}
 
-	private class ExampleCardScrollAdapter extends CardScrollAdapter {
-
-		@Override
-		public int findIdPosition(Object id) {
-			return -1;
-		}
-
-		@Override
-		public int findItemPosition(Object item) {
-			return mCards.indexOf(item);
-		}
-
-		@Override
-		public int getCount() {
-			return mCards.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return mCards.get(position);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			return mCards.get(position).toView();
-		}
-	}
 	
 	private class FlatCardScrollAdapter extends CardScrollAdapter {
 		private List<Flat> flats;
