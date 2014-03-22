@@ -1,9 +1,12 @@
 package com.hackathonglass.bbva.django;
 
+import java.util.ArrayList;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 
 import com.google.android.glass.app.Card;
@@ -20,8 +23,22 @@ public class DjangoService extends Service {
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		publishStaticCard();
-		return START_STICKY;
+		 ArrayList<String> voiceResults = intent.getExtras().getStringArrayList(RecognizerIntent.EXTRA_RESULTS);
+		 if(voiceResults.size() > 0){
+			 Intent start = new Intent(this, MainActivity.class);
+			 start.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			 start.putExtra("city", voiceResults.get(0));
+			 startActivity(start);
+		 }
+		 else {
+			 Intent start = new Intent(this, MainActivity.class);
+			 start.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			 start.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			 start.putExtra("city", "Madrid");
+			 startActivity(start);
+		 }
+		 //		publishStaticCard();
+		return super.onStartCommand(intent, flags, startId);
 	}
 
 	private void publishStaticCard() {

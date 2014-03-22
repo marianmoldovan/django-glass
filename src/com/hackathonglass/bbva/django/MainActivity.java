@@ -36,25 +36,32 @@ public class MainActivity extends Activity {
 	 private List<Flat> mFlats;
 	 private CardScrollView mCardScrollView;
 	 private FlatCardScrollAdapter superAdapter;
-	 private String URL = "http://aicu.eui.upm.es/slavy/bbva.py?s=Madrid";
+	 private String placeCity;
+	 private String URL = "http://aicu.eui.upm.es/slavy/bbva.py?s=";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        publishCard(this);
+//        publishCard(this);
+		setContentView(R.layout.loading);
+        placeCity = "Madrid";
+        if(getIntent().getExtras() != null)
+        	placeCity = getIntent().getExtras().getString("city");
+        if(placeCity == null) placeCity = "Madrid";
         getFlats();
 	}
 	
 	private void getFlats(){
-		Ion.with(this, URL)
+		Ion.with(this, URL + placeCity)
 		.as(new TypeToken<List<Flat>>(){}) //Tipado
 		.setCallback(new FutureCallback<List<Flat>>() {
 			@Override
 			public void onCompleted(Exception e, List<Flat> arg1) {
 				if(e != null);//Si la excepcion no es null, es que algo ha pasao...
 				else{
+//					unpublishCard(MainActivity.this);
+					
 			        mCardScrollView = new CardScrollView(MainActivity.this);					unpublishCard(MainActivity.this);
-					unpublishCard(MainActivity.this);
 			        setContentView(mCardScrollView);
 					createCards(arg1);
 					superAdapter = new FlatCardScrollAdapter(arg1);
@@ -64,7 +71,6 @@ public class MainActivity extends Activity {
 							superAdapter.setLastPosition(position);
 							openOptionsMenu();
 						}
-						
 					});
 			        mCardScrollView.setAdapter(superAdapter);
 			        mCardScrollView.activate();
@@ -200,7 +206,7 @@ public class MainActivity extends Activity {
 				.intoImageView(image);
 			
 			TextView address = (TextView) root.findViewById(R.id.placeAddress);
-			address.setText("Madrid, " +flat.getAddress());
+			address.setText( placeCity + ", " +flat.getAddress());
 			TextView price = (TextView) root.findViewById(R.id.placePrice);
 			price.setText(flat.getPrice());
 			TextView data = (TextView) root.findViewById(R.id.placeData);
@@ -232,16 +238,21 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
 			case R.id.action_go: {
-				getLocation("Madrid", superAdapter.getActualFlat().getAddress());
+				getLocation(placeCity, superAdapter.getActualFlat().getAddress());
 				return true;
 			}
 			case R.id.action_share: {
-				Intent shareIntent = ShareCompat.IntentBuilder.from(this)
-						.setText(superAdapter.getActualFlat().getUrl())
-						.setType("text/plain").getIntent()
-						.setPackage("com.google.android.gm");
+//				Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+//						.setText(superAdapter.getActualFlat().getUrl())
+//						.setType("text/plain").getIntent()
+//						.setPackage("com.google.android.gm");
+				
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_SEND);
+				intent.putExtra(Intent.EXTRA_TEXT, superAdapter.getActualFlat().getUrl());
+				
 				try {
-					startActivity(shareIntent);
+					startActivity(intent);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
