@@ -45,6 +45,13 @@
             android:text="Large Text"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="32sp" />
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logohead" />
+
     </LinearLayout>
 
 </LinearLayout>

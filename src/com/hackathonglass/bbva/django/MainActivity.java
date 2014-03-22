@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.support.v4.app.ShareCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
 		.setCallback(new FutureCallback<List<Place>>() {
 			@Override
 			public void onCompleted(Exception arg0, List<Place> arg1) {
-				if(arg0 != null){
+				if(arg1 != null){
 					Intent navIntent = new Intent(Intent.ACTION_VIEW,
 					        Uri.parse("google.navigation:ll=" + arg1.get(0).getLat() + "," + arg1.get(0).getLon() + "&title=" + param2));
 					startActivity(navIntent);
@@ -212,14 +212,14 @@ public class MainActivity extends Activity {
 	/**
 	 * Captura el Tap para mostrar el menu
 	 */
-	@Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-          if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-              openOptionsMenu();
-              return true;
-          }
-          return false;
-    }
+//	@Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//          if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+//              openOptionsMenu();
+//              return true;
+//          }
+//          return false;
+//    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -236,10 +236,20 @@ public class MainActivity extends Activity {
 				return true;
 			}
 			case R.id.action_share: {
-				Intent intent = new Intent();
-				intent.setAction(Intent.ACTION_SEND);
-				intent.putExtra(Intent.EXTRA_TEXT, superAdapter.getActualFlat().getUrl());
-				startActivity(intent);
+				Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+						.setText(superAdapter.getActualFlat().getUrl())
+						.setType("text/plain").getIntent()
+						.setPackage("com.google.android.gm");
+				try {
+					startActivity(shareIntent);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+//				Intent intent = new Intent();
+//				intent.setAction(Intent.ACTION_SEND);
+//				intent.putExtra(Intent.EXTRA_TEXT, superAdapter.getActualFlat().getUrl());
+//				startActivity(intent);
 				return true;
 			}
 		}
