@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,8 +15,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RemoteViews;
 
 import com.google.android.glass.app.Card;
+import com.google.android.glass.timeline.LiveCard;
+import com.google.android.glass.timeline.TimelineManager;
 import com.google.android.glass.widget.CardScrollAdapter;
 import com.google.android.glass.widget.CardScrollView;
 import com.google.gson.reflect.TypeToken;
@@ -32,14 +37,10 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		createCards();
         mCardScrollView = new CardScrollView(this);
-        
-        getFlats();
-        ExampleCardScrollAdapter adapter = new ExampleCardScrollAdapter();
-        mCardScrollView.setAdapter(adapter);
-        mCardScrollView.activate();
         setContentView(mCardScrollView);
+        publishCard(this);
+        getFlats();
 	}
 	
 	private void getFlats(){
@@ -50,6 +51,11 @@ public class MainActivity extends Activity {
 			public void onCompleted(Exception e, List<Flat> arg1) {
 				if(e != null);//Si la excepcion no es null, es que algo ha pasao...
 				else{
+					unpublishCard(MainActivity.this);
+					createCards(arg1);
+			        ExampleCardScrollAdapter adapter = new ExampleCardScrollAdapter();
+			        mCardScrollView.setAdapter(adapter);
+			        mCardScrollView.activate();
 				}
 			}
 		});
@@ -68,34 +74,42 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
-	
 	}
 
-	private void createCards() {
+	private void createCards(List<Flat> flats) {
 		mCards = new ArrayList<Card>();
+		for(Flat f:flats){
+			Card card;
+			card = new Card(this);
+			card.setText(f.getAddress() + ", " + f.getPrice());
+			card.setFootnote(f.getMetros() + ", habitaciones " + f.getRooms());
+//			card.setImageLayout(Card.ImageLayout.LEFT);
+//			 card.addImage(R.drawable.puppy_small_1);
+//			 card.addImage(R.drawable.puppy_small_2);
+//			 card.addImage(R.drawable.puppy_small_3);
+			mCards.add(card);
+		}
 
-		Card card;
+	}
+	
+	private LiveCard mLiveCard;
 
-		card = new Card(this);
-		card.setText("This card has a footer.");
-		card.setFootnote("I'm the footer!");
-		mCards.add(card);
+	private void publishCard(Context context) {
+	    if (mLiveCard == null) {
+	        TimelineManager tm = TimelineManager.from(context);
+	        mLiveCard = tm.createLiveCard("card");
+	        mLiveCard.setViews(new RemoteViews(context.getPackageName(), R.layout.loading));
+	        mLiveCard.publish(LiveCard.PublishMode.REVEAL);
+	    } else {
+	        return;
+	    }
+	}
 
-		card = new Card(this);
-		card.setText("This card has a puppy background image.");
-		card.setFootnote("How can you resist?");
-		card.setImageLayout(Card.ImageLayout.FULL);
-		// card.addImage(R.drawable.puppy_bg);
-		mCards.add(card);
-
-		card = new Card(this);
-		card.setText("This card has a mosaic of puppies.");
-		card.setFootnote("Aren't they precious?");
-		card.setImageLayout(Card.ImageLayout.LEFT);
-		// card.addImage(R.drawable.puppy_small_1);
-		// card.addImage(R.drawable.puppy_small_2);
-		// card.addImage(R.drawable.puppy_small_3);
-		mCards.add(card);
+	private void unpublishCard(Context context) {
+	    if (mLiveCard != null) {
+	        mLiveCard.unpublish();
+	        mLiveCard = null;
+	    }
 	}
 
 	private class ExampleCardScrollAdapter extends CardScrollAdapter {
