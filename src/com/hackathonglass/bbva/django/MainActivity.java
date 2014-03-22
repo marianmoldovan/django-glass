@@ -7,6 +7,8 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
@@ -51,6 +53,26 @@ public class MainActivity extends Activity {
         getFlats();
 	}
 	
+	
+	private void getLastLocationFlats(){
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		String locationProvider = LocationManager.NETWORK_PROVIDER;
+		Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+	}
+	
+	private void getFlats(Location location){
+		Ion.with(this, "http://nominatim.openstreetmap.org/reverse?format=json&lat=" + location.getLatitude() + "&lat=" + location.getLatitude())
+		.as(new TypeToken<List<Place>>(){})
+		.setCallback(new FutureCallback<List<Place>>() {
+			@Override
+			public void onCompleted(Exception arg0, List<Place> arg1) {
+				if(arg1 != null){
+					//
+				}
+			}
+		});
+	}
+	
 	private void getFlats(){
 		Ion.with(this, URL + placeCity)
 		.as(new TypeToken<List<Flat>>(){}) //Tipado
@@ -59,7 +81,6 @@ public class MainActivity extends Activity {
 			public void onCompleted(Exception e, List<Flat> arg1) {
 				if(e != null);//Si la excepcion no es null, es que algo ha pasao...
 				else{
-//					unpublishCardpiashfidoàhfs(MainActivity.this);
 			        mCardScrollView = new CardScrollView(MainActivity.this);	
 			        unpublishCard(MainActivity.this);
 			        setContentView(mCardScrollView);
