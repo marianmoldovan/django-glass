@@ -218,18 +218,6 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	/**
-	 * Captura el Tap para mostrar el menu
-	 */
-//	@Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//          if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-//              openOptionsMenu();
-//              return true;
-//          }
-//          return false;
-//    }
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -256,15 +244,26 @@ public class MainActivity extends Activity {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
 //				Intent intent = new Intent();
 //				intent.setAction(Intent.ACTION_SEND);
 //				intent.putExtra(Intent.EXTRA_TEXT, superAdapter.getActualFlat().getUrl());
 //				startActivity(intent);
 				return true;
 			}
+			case R.id.action_more:{
+				openWebPage(superAdapter.getActualFlat().getUrl());
+				return true;
+			}
 		}
 		return true;
+	}
+	
+	public void openWebPage(String url) {
+	    Uri webpage = Uri.parse(url);
+	    Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+	    if (intent.resolveActivity(getPackageManager()) != null) {
+	        startActivity(intent);
+	    }
 	}
 
 	@Override
