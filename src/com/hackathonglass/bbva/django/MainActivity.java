@@ -86,9 +86,12 @@ public class MainActivity extends Activity {
 			@Override
 			public void onCompleted(Exception arg0, List<Place> arg1) {
 				if(arg1 != null){
-					Intent navIntent = new Intent(Intent.ACTION_VIEW,
-					        Uri.parse("google.navigation:ll=" + arg1.get(0).getLat() + "," + arg1.get(0).getLon() + "&title=" + param2));
-					startActivity(navIntent);
+					try {
+						Intent navIntent = new Intent(Intent.ACTION_VIEW,Uri.parse("google.navigation:ll=" + arg1.get(0).getLat() + "," + arg1.get(0).getLon() + "&title=" + param2));
+						startActivity(navIntent);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -242,17 +245,14 @@ public class MainActivity extends Activity {
 				return true;
 			}
 			case R.id.action_share: {
-//				Intent shareIntent = ShareCompat.IntentBuilder.from(this)
-//						.setText(superAdapter.getActualFlat().getUrl())
-//						.setType("text/plain").getIntent()
-//						.setPackage("com.google.android.gm");
-				
-				Intent intent = new Intent();
-				intent.setAction(Intent.ACTION_SEND);
-				intent.putExtra(Intent.EXTRA_TEXT, superAdapter.getActualFlat().getUrl());
-				
+				Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+						.setText(superAdapter.getActualFlat().getUrl()).setSubject("Apartment").getIntent()
+						.setPackage("com.android.email");
+//				Intent intent = new Intent();
+//				intent.setAction(Intent.ACTION_SEND);
+//				intent.putExtra(Intent.EXTRA_TEXT, superAdapter.getActualFlat().getUrl());
 				try {
-					startActivity(intent);
+					startActivity(shareIntent);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

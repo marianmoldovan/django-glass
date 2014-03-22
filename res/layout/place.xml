@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:text="Large Text"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="32sp" />
+            android:textSize="28sp" />
 
         <TextView
             android:id="@+id/placePrice"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:text="Large Text"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="28sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/placeData"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:text="Large Text"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="28sp" />
+            android:textSize="24sp" />
 
         <ImageView
             android:id="@+id/imageView1"
