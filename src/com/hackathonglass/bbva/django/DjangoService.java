@@ -25,8 +25,10 @@ public class DjangoService extends Service {
 
 	private void publishStaticCard() {
 		Card card1 = new Card(this);
-		card1.setText("Hello Glass");
-		card1.setFootnote("This is my first Card!");
+		card1.setText("Un momento");
+		card1.setFootnote("Buscando viviendas...");
+		card1.setImageLayout(Card.ImageLayout.LEFT);
+		card1.addImage(R.drawable.bbvalogo);
 		TimelineManager.from(this).insert(card1);
 	}
 }
