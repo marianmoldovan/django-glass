@@ -7,23 +7,31 @@
     tools:context="com.hackathonglass.bbva.django.MainActivity"
     tools:ignore="MergeRootFrame" >
 
-    <ImageView
-        android:id="@+id/imageView1"
+    <LinearLayout
+        android:id="@+id/aaa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/bbvalogo" />
+        android:layout_centerInParent="true"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="27dp"
-        android:text="Buscando pisos..."
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-    
+        <ImageView
+            android:id="@+id/placeImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:src="@drawable/logohead" />
+
+        <TextView
+            android:id="@+id/placeAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/placeImage"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="27dp"
+            android:text="Buscando pisos..."
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
+
 </RelativeLayout>
-

@@ -15,7 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.google.android.glass.app.Card;
 import com.google.android.glass.timeline.LiveCard;
@@ -29,16 +32,13 @@ import com.koushikdutta.ion.Ion;
 public class MainActivity extends Activity {
 	
 	 private List<Card> mCards;
+	 private List<Flat> mFlats;
 	 private CardScrollView mCardScrollView;
-	 
 	 private String URL = "http://aicu.eui.upm.es/slavy/bbva.py?s=Madrid";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-        mCardScrollView = new CardScrollView(this);
-        setContentView(mCardScrollView);
         publishCard(this);
         getFlats();
 	}
@@ -51,6 +51,8 @@ public class MainActivity extends Activity {
 			public void onCompleted(Exception e, List<Flat> arg1) {
 				if(e != null);//Si la excepcion no es null, es que algo ha pasao...
 				else{
+			        mCardScrollView = new CardScrollView(MainActivity.this);
+			        setContentView(mCardScrollView);
 					unpublishCard(MainActivity.this);
 					createCards(arg1);
 			        ExampleCardScrollAdapter adapter = new ExampleCardScrollAdapter();
@@ -83,13 +85,13 @@ public class MainActivity extends Activity {
 			card = new Card(this);
 			card.setText(f.getAddress() + ", " + f.getPrice());
 			card.setFootnote(f.getMetros() + ", habitaciones " + f.getRooms());
+//			card.addImage(Uri.parse(f.getPicture()));
 //			card.setImageLayout(Card.ImageLayout.LEFT);
 //			 card.addImage(R.drawable.puppy_small_1);
 //			 card.addImage(R.drawable.puppy_small_2);
 //			 card.addImage(R.drawable.puppy_small_3);
 			mCards.add(card);
 		}
-
 	}
 	
 	private LiveCard mLiveCard;
@@ -98,6 +100,8 @@ public class MainActivity extends Activity {
 	    if (mLiveCard == null) {
 	        TimelineManager tm = TimelineManager.from(context);
 	        mLiveCard = tm.createLiveCard("card");
+	        Intent intent = new Intent(context, MainActivity.class);
+	        mLiveCard.setAction(PendingIntent.getActivity(context, 0, intent, 0));
 	        mLiveCard.setViews(new RemoteViews(context.getPackageName(), R.layout.loading));
 	        mLiveCard.publish(LiveCard.PublishMode.REVEAL);
 	    } else {
@@ -136,6 +140,43 @@ public class MainActivity extends Activity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
+			return mCards.get(position).toView();
+		}
+	}
+	
+	private class FlatCardScrollAdapter extends CardScrollAdapter {
+		private List<Flat> flats;
+		
+		public FlatCardScrollAdapter(List <Flat> flats){
+			this.flats = flats;
+		}
+
+		@Override
+		public int findIdPosition(Object id) {
+			return -1;
+		}
+
+		@Override
+		public int findItemPosition(Object item) {
+			return flats.indexOf(item);
+		}
+
+		@Override
+		public int getCount() {
+			return flats.size();
+		}
+
+		@Override
+		public Object getItem(int position) { 
+			return flats.get(position);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View root = getLayoutInflater().inflate(R.layout.place, null);
+			ImageView image = (ImageView) root.findViewById(R.id.placeImage);
+			Flat flat = flats.get(position);
+			Ion.with(image).load(flat.getPicture());
 			return mCards.get(position).toView();
 		}
 	}
