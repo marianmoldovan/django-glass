@@ -15,10 +15,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.android.glass.app.Card;
 import com.google.android.glass.timeline.LiveCard;
@@ -34,6 +35,7 @@ public class MainActivity extends Activity {
 	 private List<Card> mCards;
 	 private List<Flat> mFlats;
 	 private CardScrollView mCardScrollView;
+	 private FlatCardScrollAdapter superAdapter;
 	 private String URL = "http://aicu.eui.upm.es/slavy/bbva.py?s=Madrid";
 
 	@Override
@@ -51,12 +53,20 @@ public class MainActivity extends Activity {
 			public void onCompleted(Exception e, List<Flat> arg1) {
 				if(e != null);//Si la excepcion no es null, es que algo ha pasao...
 				else{
-			        mCardScrollView = new CardScrollView(MainActivity.this);
-			        setContentView(mCardScrollView);
+			        mCardScrollView = new CardScrollView(MainActivity.this);					unpublishCard(MainActivity.this);
 					unpublishCard(MainActivity.this);
+			        setContentView(mCardScrollView);
 					createCards(arg1);
-			        ExampleCardScrollAdapter adapter = new ExampleCardScrollAdapter();
-			        mCardScrollView.setAdapter(adapter);
+					superAdapter = new FlatCardScrollAdapter(arg1);
+					mCardScrollView.setOnItemClickListener(new OnItemClickListener() {
+						@Override
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+							superAdapter.setLastPosition(position);
+							openOptionsMenu();
+						}
+						
+					});
+			        mCardScrollView.setAdapter(superAdapter);
 			        mCardScrollView.activate();
 				}
 			}
@@ -104,7 +114,7 @@ public class MainActivity extends Activity {
 	        mLiveCard.setAction(PendingIntent.getActivity(context, 0, intent, 0));
 	        mLiveCard.setViews(new RemoteViews(context.getPackageName(), R.layout.loading));
 	        mLiveCard.publish(LiveCard.PublishMode.REVEAL);
-	    } else {
+	    } else { 
 	        return;
 	    }
 	}
@@ -146,9 +156,18 @@ public class MainActivity extends Activity {
 	
 	private class FlatCardScrollAdapter extends CardScrollAdapter {
 		private List<Flat> flats;
+		private int lastPosition;
 		
 		public FlatCardScrollAdapter(List <Flat> flats){
 			this.flats = flats;
+		}
+		
+		public Flat getActualFlat(){
+			return flats.get(lastPosition);
+		}
+		
+		public void setLastPosition(int position){
+			lastPosition = position;
 		}
 
 		@Override
@@ -176,8 +195,17 @@ public class MainActivity extends Activity {
 			View root = getLayoutInflater().inflate(R.layout.place, null);
 			ImageView image = (ImageView) root.findViewById(R.id.placeImage);
 			Flat flat = flats.get(position);
-			Ion.with(image).load(flat.getPicture());
-			return mCards.get(position).toView();
+			Ion.with(MainActivity.this, flat.getPicture())
+				.withBitmap()
+				.intoImageView(image);
+			
+			TextView address = (TextView) root.findViewById(R.id.placeAddress);
+			address.setText("Madrid, " +flat.getAddress());
+			TextView price = (TextView) root.findViewById(R.id.placePrice);
+			price.setText(flat.getPrice());
+			TextView data = (TextView) root.findViewById(R.id.placeData);
+			data.setText(flat.getMetros() + ", " + flat.getRooms());
+			return root;
 		}
 	}
 
@@ -202,8 +230,20 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// No hace nada
-		return super.onOptionsItemSelected(item);
+		switch(item.getItemId()){
+			case R.id.action_go: {
+				getLocation("Madrid", superAdapter.getActualFlat().getAddress());
+				return true;
+			}
+			case R.id.action_share: {
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_SEND);
+				intent.putExtra(Intent.EXTRA_TEXT, superAdapter.getActualFlat().getUrl());
+				startActivity(intent);
+				return true;
+			}
+		}
+		return true;
 	}
 
 	@Override

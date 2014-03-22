@@ -3,9 +3,12 @@
     tools:context="com.hackathonglass.bbva.django.MainActivity" >
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:id="@+id/action_go"
+        android:icon="@drawable/ic_menu_go"
+        android:title="Go"/>
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_menu_share"
+        android:title="Share"/>
 
 </menu>
